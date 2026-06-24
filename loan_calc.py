@@ -122,6 +122,7 @@ def generate_loan_schedule(
     extra_payment_amount: float = 0.0,
     extra_payment_type: str = 'none',  # 'none' | 'one-time' | 'recurring'
     extra_payment_start_month: int = 1,
+    extra_payments_by_period: dict = None,
     rounding=ROUND_HALF_UP,
 ) -> LoanSummary:
     """Generate full amortization schedule for a reducing balance loan using Decimal.
@@ -141,10 +142,14 @@ def generate_loan_schedule(
     schedule: List[LoanScheduleRow] = []
     balance = p
 
-    # Normalize extra payment amount
+    # Normalize extra payment amount or use explicit per-period extra payments if provided
     extra_amt = Decimal(str(extra_payment_amount)) if extra_payment_amount else Decimal('0')
+    use_period_extras = extra_payments_by_period is not None
+    if use_period_extras:
+        # convert keys to int and values to Decimal
+        period_extras = {int(k): Decimal(str(v)) for k, v in extra_payments_by_period.items()}
 
-    if extra_amt == Decimal('0'):
+    if (not use_period_extras) and extra_amt == Decimal('0'):
         # No extra payments: keep original, stable behavior (identical rounding behavior)
         for period in range(1, n + 1):
             opening = balance
@@ -202,10 +207,13 @@ def generate_loan_schedule(
 
             # Determine extra payment for this period
             extra_this = Decimal('0')
-            if extra_payment_type == 'recurring' and period >= int(extra_payment_start_month):
-                extra_this = extra_amt
-            elif extra_payment_type == 'one-time' and period == int(extra_payment_start_month):
-                extra_this = extra_amt
+            if use_period_extras:
+                extra_this = period_extras.get(period, Decimal('0'))
+            else:
+                if extra_payment_type == 'recurring' and period >= int(extra_payment_start_month):
+                    extra_this = extra_amt
+                elif extra_payment_type == 'one-time' and period == int(extra_payment_start_month):
+                    extra_this = extra_amt
 
             # Apply extra payment into principal
             principal_part_total = (principal_part + extra_this).quantize(TWO_PLACES, rounding=rounding)

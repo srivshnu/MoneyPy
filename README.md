@@ -1,16 +1,15 @@
 # Financial Calculators Suite
 
-A professional financial computing and analysis toolkit built with Python and Streamlit. This suite provides high-precision calculations for reducing balance loans, prepayment options, annual tax deduction logic, and diverse investment pathways including Fixed Deposits (FD), Recurring Deposits (RD), and Compound Interest (CI) schedules.
+A professional financial computing and analysis toolkit built with Python and Streamlit. This suite provides high-precision calculations for reducing balance loans, prepayment and prepayment-impact simulations, and diverse investment pathways including Fixed Deposits (FD), Recurring Deposits (RD), and Compound Interest (CI) schedules.
 
 ## Features
 
 ### 1. Loan & Core Calculations
 * **Reducing Balance (EMI) Engine:** Computes stable reducing balance loans with robust Decimal precision to avoid fractional floating-point inaccuracies.
 * **Prepayment & Rate Schedules:** Supports flexible simulations for one-time or recurring prepayments and multi-period interest rate adjustments.
-* **Tax Benefit Estimator:** Dynamically groups amortization schedules into yearly periods, capping output against configurable investment parameters (such as Section 80C and 24b constraints).
 * **Payment to Tenure:** Resolves reverse loan parameters to determine the total months required to clear liabilities given a fixed premium target.
 
-### New Interactive Tools (added)
+-### New Interactive Tools (added)
 - **Prepayment Impact Calculator:** Shows interest saved and months reduced for one-time or recurring prepayments.
 - **Amortization Charts:** Line and pie charts for outstanding balance and principal vs interest breakdown.
 - **Multi-Loan Comparison:** Side-by-side comparison of two loan scenarios (different tenures, rates, or extra payments).
@@ -20,6 +19,8 @@ A professional financial computing and analysis toolkit built with Python and St
 	- Pairwise deltas vs the first loan (Δ EMI, Δ Total Interest, Δ Tenure).
 
 Usage tip: open the "Multi-Loan Comparison" page in the app, set "Number of loans to compare", fill the loan fields, then press "Compare Loans". The first loan entered is used as the reference for pairwise deltas.
+
+Additionally, a new **Co-ownership / Equity Contribution Tracker** page has been added. This page lets you model multiple co-owners, record down payments, specify each owner's monthly EMI share and extra one-time or recurring contributions, and then compute evolving ownership percentages over time based on both legal down-payment shares and actual principal contributed.
 
 ### 2. Investment Portfolio Planners
 * **Fixed Deposits (FD):** Tracks deposit appreciation over configurable compounding frequencies (Monthly, Quarterly, Half-Yearly, Yearly) with accurate yield metrics.
@@ -32,10 +33,10 @@ Usage tip: open the "Multi-Loan Comparison" page in the app, set "Number of loan
 ## System Architecture
 
 The codebase relies on strict mathematical and application tier separation:
-* `loan_calc.py`: Pure computational engine managing decimal quantization and multi-year tax calculations.
+* `loan_calc.py`: Pure computational engine managing decimal quantization and amortization schedules (EMI and prepayment handling).
 * `investment_calc.py`: Financial model dataclasses and looping algorithms for structural investment plans.
 * `excel_export.py`: Template generation layer configured via openpyxl.
-* `app.py`: High-level entry routing across modules (`loan_page.py`, `investment_page.py`, `payment_to_tenure.py`).
+* `app.py`: High-level entry routing across modules (`loan_page.py`, `investment_page.py`, `payment_to_tenure.py`, `ownership_page.py`).
 
 ## Installation
 
@@ -128,6 +129,6 @@ pip install pytest
 
 Notes
 
-- Primary UI pages are implemented in `loan_page.py`, `prepayment_page.py`, `charts_page.py`, and `multi_loan_page.py`.
+- Primary UI pages are implemented in `loan_page.py`, `prepayment_page.py`, `charts_page.py`, `multi_loan_page.py`, and `ownership_page.py`.
 - Computational logic lives in `logic/` (`loan_calc.py`, `prepayment.py`, `multi_loan.py`).
 - Excel export uses `excel_export.py` and requires `openpyxl` (listed in `requirements.txt`).
