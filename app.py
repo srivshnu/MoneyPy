@@ -21,11 +21,20 @@ pay_mod = load_module_from_path(PAY_PAGE, "payment_to_tenure")
 
 st.set_page_config(page_title="Finance Tools", layout="wide")
 
-choice = st.sidebar.radio("Choose tool", ["Loan Calculator", "Payment → Tenure", "Investment Calculator"]) 
+choice = st.sidebar.radio("Choose tool", ["Loan Calculator", "Payment → Tenure", "Investment Calculator", "Prepayment Impact", "Amortization Charts", "Multi-Loan Comparison"]) 
 
 if choice == "Loan Calculator":
     loan_mod.render()
 elif choice == "Payment → Tenure":
     pay_mod.render()
+elif choice == "Prepayment Impact":
+    prepay_mod = load_module_from_path(os.path.join(BASE_DIR, "prepayment_page.py"), "prepayment_page")
+    prepay_mod.render()
+elif choice == "Amortization Charts":
+    charts_mod = load_module_from_path(os.path.join(BASE_DIR, "charts_page.py"), "charts_page")
+    charts_mod.render()
+elif choice == "Multi-Loan Comparison":
+    compare_mod = load_module_from_path(os.path.join(BASE_DIR, "multi_loan_page.py"), "multi_loan_page")
+    compare_mod.render()
 else:
     inv_mod.render()

@@ -4,6 +4,7 @@ from openpyxl.styles import (
     Font, PatternFill, Alignment, Border, Side, numbers
 )
 from openpyxl.utils import get_column_letter
+from openpyxl.chart import LineChart, Reference
 
 from loan_calc import LoanSummary
 from investment_calc import FDSummary, RDSummary, CISummary
@@ -287,6 +288,81 @@ def export_ci_excel(summary: CISummary) -> bytes:
                            row.closing_balance, row.cumulative_interest], alt=(i % 2 == 1))
 
     _set_col_widths(ws, [10, 22, 22, 22, 25])
+    buf = io.BytesIO()
+    wb.save(buf)
+    return buf.getvalue()
+
+
+def export_comparison_excel(summaries) -> bytes:
+    """Export multiple loan summaries into a single workbook.
+
+    `summaries` should be an iterable of tuples (name, LoanSummary).
+    """
+    wb = Workbook()
+
+    # Summary sheet with metrics for all loans
+    ws = wb.active
+    ws.title = "Comparison Summary"
+    ws.sheet_view.showGridLines = False
+
+    _title(ws, 1, "🔁  Loan Comparison Summary", max(5, len(summaries) + 1))
+    _header_row(ws, 3, ["Loan", "EMI (₹)", "Tenure (months)", "Total Payment (₹)", "Total Interest (₹)"])
+
+    for i, (name, s) in enumerate(summaries):
+        r = 4 + i
+        values = [name, s.emi, s.tenure_months, s.total_payment, s.total_interest]
+        _data_row(ws, r, values, alt=(i % 2 == 1))
+
+    _set_col_widths(ws, [20, 18, 18, 20, 20])
+
+    # Add individual amortization sheets
+    for name, s in summaries:
+        ws_s = wb.create_sheet(title=name[:31])
+        ws_s.sheet_view.showGridLines = False
+        _title(ws_s, 1, f"📋  {name} — Amortization", 6)
+        cols = ["Month", "Opening Balance (₹)", "EMI (₹)", "Extra Payment (₹)", "Principal (₹)", "Interest (₹)", "Closing Balance (₹)"]
+        _header_row(ws_s, 3, cols)
+        for i, row in enumerate(s.schedule):
+            r = i + 4
+            values = [row.period, row.opening_balance, row.emi, getattr(row, 'extra_payment', 0.0), row.principal, row.interest, row.closing_balance]
+            _data_row(ws_s, r, values, alt=(i % 2 == 1))
+        _set_col_widths(ws_s, [10, 22, 18, 18, 18, 22])
+
+    # Build a ChartData sheet with Month + each loan outstanding so we can create a native chart
+    chart_ws = wb.create_sheet('ChartData')
+    # Determine max months
+    max_months = max(len(s.schedule) for _, s in summaries)
+    # Header row
+    headers = ['Month'] + [name for name, _ in summaries]
+    _header_row(chart_ws, 1, headers)
+    # Fill rows
+    for m in range(1, max_months + 1):
+        row_vals = [m]
+        for _, s in summaries:
+            if m <= len(s.schedule):
+                row_vals.append(s.schedule[m-1].opening_balance)
+            else:
+                row_vals.append(None)
+        _data_row(chart_ws, 1 + m, row_vals, alt=(m % 2 == 1))
+    _set_col_widths(chart_ws, [10] + [18]*len(summaries))
+
+    # Create LineChart referencing the ChartData range
+    try:
+        chart = LineChart()
+        chart.title = "Outstanding Balance Comparison"
+        chart.y_axis.title = 'Outstanding Balance'
+        chart.x_axis.title = 'Month'
+        data_ref = Reference(chart_ws, min_col=2, min_row=1, max_col=1+len(summaries), max_row=1+max_months)
+        cats = Reference(chart_ws, min_col=1, min_row=2, max_row=1+max_months)
+        chart.add_data(data_ref, titles_from_data=True)
+        chart.set_categories(cats)
+        chart.width = 20
+        chart.height = 7
+        ws.add_chart(chart, 'H2')
+    except Exception:
+        # non-fatal: if chart creation fails, skip
+        pass
+
     buf = io.BytesIO()
     wb.save(buf)
     return buf.getvalue()
