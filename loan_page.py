@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 import decimal
 from loan_calc import generate_loan_schedule, compute_tenure_from_payment
+from ui_helpers import validate_required
 from excel_export import export_loan_excel
 
 
@@ -38,6 +39,13 @@ def render():
         submitted = st.form_submit_button("📊 Calculate EMI", width='stretch')
 
     if submitted:
+        missing = validate_required({
+            'Loan Principal': principal,
+            'Annual Interest Rate (%)': rate,
+            'Tenure (Months)': tenure,
+        })
+        if missing:
+            return
         # Parse rate schedule if provided
         rate_schedule = None
         if rate_schedule_text.strip():

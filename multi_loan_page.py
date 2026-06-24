@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 from loan_calc import generate_loan_schedule
+from ui_helpers import validate_required
 from excel_export import export_comparison_excel
 
 
@@ -45,6 +46,17 @@ def render():
         submitted = st.form_submit_button("Compare Loans")
 
     if submitted:
+        # validate loans
+        missing_fields = []
+        for idx, l in enumerate(loans):
+            if l['principal'] <= 0:
+                missing_fields.append(f'Loan {idx+1}: Principal must be > 0')
+            if l['tenure_months'] <= 0:
+                missing_fields.append(f'Loan {idx+1}: Tenure must be >= 1')
+        if missing_fields:
+            st.error('Please correct the following required fields:\n' + '\n'.join(f'- {m}' for m in missing_fields))
+            return
+
         summaries = []
         for idx, params in enumerate(loans):
             s = generate_loan_schedule(

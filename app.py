@@ -14,6 +14,7 @@ BASE_DIR = os.path.dirname(__file__)
 LOAN_PAGE = os.path.join(BASE_DIR, "loan_page.py")
 INV_PAGE = os.path.join(BASE_DIR, "investment_page.py")
 PAY_PAGE = os.path.join(BASE_DIR, "payment_to_tenure.py")
+OWNERSHIP_PAGE = os.path.join(BASE_DIR, "ownership_page.py")
 
 loan_mod = load_module_from_path(LOAN_PAGE, "loan_page")
 inv_mod = load_module_from_path(INV_PAGE, "investment_page")
@@ -21,7 +22,16 @@ pay_mod = load_module_from_path(PAY_PAGE, "payment_to_tenure")
 
 st.set_page_config(page_title="Finance Tools", layout="wide")
 
-choice = st.sidebar.radio("Choose tool", ["Loan Calculator", "Payment → Tenure", "Investment Calculator", "Prepayment Impact", "Amortization Charts", "Multi-Loan Comparison"]) 
+
+choice = st.sidebar.radio("Choose tool", [
+    "Loan Calculator",
+    "Payment → Tenure",
+    "Investment Calculator",
+    "Prepayment Impact",
+    "Amortization Charts",
+    "Multi-Loan Comparison",
+    "Co-ownership Tracker",
+]) 
 
 if choice == "Loan Calculator":
     loan_mod.render()
@@ -36,5 +46,8 @@ elif choice == "Amortization Charts":
 elif choice == "Multi-Loan Comparison":
     compare_mod = load_module_from_path(os.path.join(BASE_DIR, "multi_loan_page.py"), "multi_loan_page")
     compare_mod.render()
+elif choice == "Co-ownership Tracker":
+    own_mod = load_module_from_path(os.path.join(BASE_DIR, "ownership_page.py"), "ownership_page")
+    own_mod.render()
 else:
     inv_mod.render()

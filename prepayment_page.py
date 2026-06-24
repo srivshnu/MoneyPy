@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
 from logic.prepayment import compute_prepayment_impact
+from ui_helpers import validate_required
 
 
 def render():
@@ -25,6 +26,19 @@ def render():
         submitted = st.form_submit_button("Compute Impact")
 
     if submitted:
+        missing = validate_required({
+            'Loan Principal': principal,
+            'Annual Interest Rate (%)': rate,
+            'Tenure (Months)': tenure,
+        })
+        if missing:
+            return
+
+        # if extra payment specified, ensure amount is provided
+        if extra_type != 'none' and (extra_amount is None or extra_amount <= 0):
+            st.error('Extra payment selected but no extra amount provided.')
+            return
+
         result = compute_prepayment_impact(principal, rate, tenure, extra_amount, extra_type, extra_start)
 
         orig = result['original']

@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from loan_calc import generate_loan_schedule, compute_tenure_from_payment
 from excel_export import export_loan_excel
+from ui_helpers import validate_required
 
 
 def render():
@@ -28,6 +29,13 @@ def render():
         submitted = st.form_submit_button("🔢 Compute Tenure", width='stretch')
 
     if submitted:
+        missing = validate_required({
+            'Loan Principal': principal,
+            'Annual Interest Rate (%)': rate,
+            'Desired Monthly Payment': monthly_payment,
+        })
+        if missing:
+            return
         try:
             months = compute_tenure_from_payment(principal, rate, monthly_payment)
         except ValueError as e:

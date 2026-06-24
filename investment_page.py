@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from investment_calc import generate_fd_schedule, generate_rd_schedule, generate_ci_schedule
 from excel_export import export_fd_excel, export_rd_excel, export_ci_excel
+from ui_helpers import validate_required
 
 COMPOUNDING_OPTIONS = ["Monthly", "Quarterly", "Half-Yearly", "Yearly"]
 
@@ -35,6 +36,13 @@ def render():
             fd_submit = st.form_submit_button("📊 Calculate FD", width='stretch')
 
         if fd_submit:
+            missing = validate_required({
+                'FD Principal': fd_principal,
+                'FD Annual Rate (%)': fd_rate,
+                'FD Tenure (Months)': fd_tenure,
+            })
+            if missing:
+                return
             s = generate_fd_schedule(fd_principal, fd_rate, fd_tenure, fd_comp)
 
             k1, k2, k3, k4 = st.columns(4)
@@ -84,6 +92,13 @@ def render():
             rd_submit = st.form_submit_button("📊 Calculate RD", width='stretch')
 
         if rd_submit:
+            missing = validate_required({
+                'RD Monthly Installment': rd_install,
+                'RD Annual Rate (%)': rd_rate,
+                'RD Tenure (Months)': rd_tenure,
+            })
+            if missing:
+                return
             s = generate_rd_schedule(rd_install, rd_rate, rd_tenure)
 
             k1, k2, k3, k4 = st.columns(4)
@@ -137,6 +152,13 @@ def render():
             ci_submit = st.form_submit_button("📊 Calculate CI", width='stretch')
 
         if ci_submit:
+            missing = validate_required({
+                'CI Principal': ci_principal,
+                'CI Annual Rate (%)': ci_rate,
+                'CI Tenure (Years)': ci_years,
+            })
+            if missing:
+                return
             s = generate_ci_schedule(ci_principal, ci_rate, ci_years, ci_comp)
 
             k1, k2, k3, k4 = st.columns(4)

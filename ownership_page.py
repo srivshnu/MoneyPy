@@ -51,6 +51,16 @@ def render():
     if total_share == 0:
         st.error('Sum of monthly shares must be > 0')
         return
+    # validate owner names
+    missing = []
+    for i, o in enumerate(owners):
+        if not o['name'] or str(o['name']).strip() == '':
+            missing.append(f'Owner {i+1}: name')
+        if o['share_pct'] <= 0:
+            missing.append(f'Owner {i+1}: monthly share percentage must be > 0')
+    if missing:
+        st.error('Please provide the following required details:\n' + '\n'.join(f'- {m}' for m in missing))
+        return
     for o in owners:
         o['share'] = o['share_pct'] / total_share
 
