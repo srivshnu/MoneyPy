@@ -1,4 +1,3 @@
-```markdown
 # Financial Calculators Suite
 
 A professional financial computing and analysis toolkit built with Python and Streamlit. This suite provides high-precision calculations for reducing balance loans, prepayment options, annual tax deduction logic, and diverse investment pathways including Fixed Deposits (FD), Recurring Deposits (RD), and Compound Interest (CI) schedules.
