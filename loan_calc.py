@@ -110,56 +110,7 @@ def compute_tenure_from_payment(principal: float, annual_rate: float, monthly_pa
     return int(math.ceil(n))
 
 
-def compute_tax_benefits(summary: LoanSummary, principal_cap: float = 150000.0, interest_cap: float = 200000.0, months_per_year: int = 12):
-    """Aggregate schedule into yearly tax-deduction estimates.
-
-    - `principal_cap` is the maximum deductible principal per year (e.g., Sec 80C).
-    - `interest_cap` is the maximum deductible interest per year (e.g., Sec 24b for self-occupied).
-
-    Returns a dict with per-year totals and overall totals.
-    """
-    from collections import defaultdict
-
-    principal_cap_d = Decimal(str(principal_cap))
-    interest_cap_d = Decimal(str(interest_cap))
-
-    years = defaultdict(lambda: {'principal': Decimal('0.00'), 'interest': Decimal('0.00')})
-    for row in summary.schedule:
-        year = (row.period - 1) // months_per_year + 1
-        years[year]['principal'] += Decimal(str(row.principal))
-        years[year]['interest'] += Decimal(str(row.interest))
-
-    per_year = {}
-    total_principal = Decimal('0.00')
-    total_interest = Decimal('0.00')
-    total_principal_deductible = Decimal('0.00')
-    total_interest_deductible = Decimal('0.00')
-
-    for y in sorted(years.keys()):
-        p_amt = years[y]['principal'].quantize(TWO_PLACES)
-        i_amt = years[y]['interest'].quantize(TWO_PLACES)
-        p_ded = min(p_amt, principal_cap_d)
-        i_ded = min(i_amt, interest_cap_d)
-        per_year[y] = {
-            'principal_paid': float(p_amt),
-            'interest_paid': float(i_amt),
-            'principal_deductible': float(p_ded),
-            'interest_deductible': float(i_ded),
-        }
-        total_principal += p_amt
-        total_interest += i_amt
-        total_principal_deductible += p_ded
-        total_interest_deductible += i_ded
-
-    return {
-        'per_year': per_year,
-        'totals': {
-            'principal_paid': float(total_principal.quantize(TWO_PLACES)),
-            'interest_paid': float(total_interest.quantize(TWO_PLACES)),
-            'principal_deductible': float(total_principal_deductible.quantize(TWO_PLACES)),
-            'interest_deductible': float(total_interest_deductible.quantize(TWO_PLACES)),
-        }
-    }
+# Tax-related helper `compute_tax_benefits` removed per project request.
 
 
 def generate_loan_schedule(

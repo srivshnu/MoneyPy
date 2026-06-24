@@ -1,4 +1,4 @@
-from loan_calc import generate_loan_schedule, compute_tenure_from_payment, compute_tax_benefits
+from loan_calc import generate_loan_schedule, compute_tenure_from_payment
 
 def print_sample(schedule, label):
     print(f"--- {label} ---")
@@ -27,9 +27,7 @@ monthly_payment = 25000.0
 months_needed = compute_tenure_from_payment(p, base_rate, monthly_payment, rate_schedule=rate_schedule)
 print(f"Months to repay with monthly payment {monthly_payment}: {months_needed}")
 
-# Tax benefits
-tax = compute_tax_benefits(summary1, principal_cap=150000.0, interest_cap=200000.0)
-print('Tax totals:', tax['totals'])
+# (Tax-related sample removed)
 
 # Scenario 2: No extra payments, fixed rate
 summary2 = generate_loan_schedule(100000.0, 7.5, 24)

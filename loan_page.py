@@ -5,7 +5,7 @@ import sys, os
 sys.path.insert(0, os.path.dirname(__file__))
 
 import decimal
-from loan_calc import generate_loan_schedule, compute_tenure_from_payment, compute_tax_benefits
+from loan_calc import generate_loan_schedule, compute_tenure_from_payment
 from excel_export import export_loan_excel
 
 
@@ -33,10 +33,7 @@ def render():
         extra_start = st.number_input("Start Month for Extra Payment (1-based)", min_value=1, max_value=10000, value=1, step=1)
         rate_schedule_text = st.text_input("Rate schedule (format: start_month:rate, e.g. 1:8.5,13:9.0)", value="")
 
-        # Tax caps for simple deduction estimates
-        st.markdown("""**Tax deduction caps (per year)**""")
-        principal_cap = st.number_input("Principal deduction cap (e.g., Sec 80C)", min_value=0.0, value=150000.0, step=1000.0, format="%.2f")
-        interest_cap = st.number_input("Interest deduction cap (e.g., Sec 24b)", min_value=0.0, value=200000.0, step=1000.0, format="%.2f")
+        # (Tax deduction inputs removed)
 
         submitted = st.form_submit_button("📊 Calculate EMI", width='stretch')
 
@@ -72,20 +69,7 @@ def render():
 
         st.markdown("---")
 
-        # ── Tax benefit estimate ──
-        tax = compute_tax_benefits(summary, principal_cap=principal_cap, interest_cap=interest_cap)
-        per_year = tax['per_year']
-        totals = tax['totals']
-        st.markdown("### 🧾 Estimated Yearly Tax Deductions")
-        ty_df = pd.DataFrame([{
-            'Year': y,
-            'Principal Paid (₹)': f"₹{per_year[y]['principal_paid']:,.2f}",
-            'Principal Deductible (₹)': f"₹{per_year[y]['principal_deductible']:,.2f}",
-            'Interest Paid (₹)': f"₹{per_year[y]['interest_paid']:,.2f}",
-            'Interest Deductible (₹)': f"₹{per_year[y]['interest_deductible']:,.2f}",
-        } for y in sorted(per_year.keys())])
-        st.dataframe(ty_df, width='stretch')
-        st.markdown(f"**Totals — Principal paid:** ₹{totals['principal_paid']:,.2f} — Principal deductible: ₹{totals['principal_deductible']:,.2f} — Interest paid: ₹{totals['interest_paid']:,.2f} — Interest deductible: ₹{totals['interest_deductible']:,.2f}")
+        # (Tax deduction display removed)
 
         # ── Chart ──
         st.markdown("### 📈 Principal vs Interest (Running)")
