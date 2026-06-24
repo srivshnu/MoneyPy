@@ -26,9 +26,9 @@ def render():
         fig = px.line(df.reset_index(), x='Month', y='Outstanding', title='Outstanding Balance Over Time')
         fig.update_traces(mode='lines', line=dict(width=2, color='#2E75B6'))
         fig.update_layout(height=400)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
         st.markdown("### Principal vs Interest (Total)")
         pie_df = pd.DataFrame({'Label': ['Principal', 'Interest'], 'Value': [summary.principal, summary.total_interest]})
         fig = px.pie(pie_df, values='Value', names='Label', title='Principal vs Interest', hole=0)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')

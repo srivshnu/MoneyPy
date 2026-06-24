@@ -25,7 +25,7 @@ def render():
         monthly_payment = st.number_input("Desired Monthly Payment (₹)", min_value=1.0,
                                           value=10000.0, step=100.0, format="%.2f")
 
-        submitted = st.form_submit_button("🔢 Compute Tenure", use_container_width=True)
+        submitted = st.form_submit_button("🔢 Compute Tenure", width='stretch')
 
     if submitted:
         try:
@@ -64,7 +64,7 @@ def render():
             "Interest (₹)": f"₹{r.interest:,.2f}",
             "Closing Balance (₹)": f"₹{r.closing_balance:,.2f}",
         } for r in summary.schedule])
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width='stretch', hide_index=True)
 
         xlsx_bytes = export_loan_excel(summary)
         st.download_button(
@@ -72,5 +72,5 @@ def render():
             data=xlsx_bytes,
             file_name="payment_to_tenure.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            use_container_width=True,
+            width='stretch',
         )

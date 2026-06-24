@@ -51,7 +51,7 @@ def render():
         fig = px.line(plot_df, x='Month', y='Outstanding', color='Scenario', title='Outstanding Balance Comparison')
         fig.update_traces(mode='lines', hovertemplate='Month: %{x}<br>Balance: %{y:,.2f}')
         fig.update_layout(height=400)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
         # Pie charts for principal vs interest
         st.markdown("### Principal vs Interest Breakdown")
@@ -63,5 +63,5 @@ def render():
         })
         fig1 = px.pie(pie_df, values='Original', names='Label', title='Original', hole=0)
         fig2 = px.pie(pie_df, values='With Prepayment', names='Label', title='With Prepayment', hole=0)
-        st.plotly_chart(fig1, use_container_width=True)
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig1, width='stretch')
+        st.plotly_chart(fig2, width='stretch')

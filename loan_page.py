@@ -38,7 +38,7 @@ def render():
         principal_cap = st.number_input("Principal deduction cap (e.g., Sec 80C)", min_value=0.0, value=150000.0, step=1000.0, format="%.2f")
         interest_cap = st.number_input("Interest deduction cap (e.g., Sec 24b)", min_value=0.0, value=200000.0, step=1000.0, format="%.2f")
 
-        submitted = st.form_submit_button("📊 Calculate EMI", use_container_width=True)
+        submitted = st.form_submit_button("📊 Calculate EMI", width='stretch')
 
     if submitted:
         # Parse rate schedule if provided
@@ -84,7 +84,7 @@ def render():
             'Interest Paid (₹)': f"₹{per_year[y]['interest_paid']:,.2f}",
             'Interest Deductible (₹)': f"₹{per_year[y]['interest_deductible']:,.2f}",
         } for y in sorted(per_year.keys())])
-        st.dataframe(ty_df, use_container_width=True)
+        st.dataframe(ty_df, width='stretch')
         st.markdown(f"**Totals — Principal paid:** ₹{totals['principal_paid']:,.2f} — Principal deductible: ₹{totals['principal_deductible']:,.2f} — Interest paid: ₹{totals['interest_paid']:,.2f} — Interest deductible: ₹{totals['interest_deductible']:,.2f}")
 
         # ── Chart ──
@@ -124,7 +124,7 @@ def render():
             "Interest (₹)":      f"₹{r.interest:,.2f}",
             "Closing Balance (₹)": f"₹{r.closing_balance:,.2f}",
         } for r in summary.schedule])
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width='stretch', hide_index=True)
 
         # ── Download ──
         xlsx_bytes = export_loan_excel(summary)
@@ -133,5 +133,5 @@ def render():
             data=xlsx_bytes,
             file_name="loan_amortization.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            use_container_width=True,
+            width='stretch',
         )

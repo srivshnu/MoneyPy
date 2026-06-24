@@ -32,7 +32,7 @@ def render():
                                              max_value=120, value=12, step=1, key="fd_t")
             with c4:
                 fd_comp = st.selectbox("Compounding", COMPOUNDING_OPTIONS, index=1, key="fd_c")
-            fd_submit = st.form_submit_button("📊 Calculate FD", use_container_width=True)
+            fd_submit = st.form_submit_button("📊 Calculate FD", width='stretch')
 
         if fd_submit:
             s = generate_fd_schedule(fd_principal, fd_rate, fd_tenure, fd_comp)
@@ -59,13 +59,13 @@ def render():
                 "Closing Balance (₹)":      f"₹{r.closing_balance:,.2f}",
                 "Cumulative Interest (₹)":  f"₹{r.cumulative_interest:,.2f}",
             } for r in s.schedule])
-            st.dataframe(df, use_container_width=True, hide_index=True)
+            st.dataframe(df, width='stretch', hide_index=True)
 
             xlsx = export_fd_excel(s)
             st.download_button("⬇️  Download FD Excel Report", xlsx,
                                "fd_report.xlsx",
                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                               use_container_width=True)
+                               width='stretch')
 
     # ── RD ────────────────────────────────────────────────────────────────────
     with tab_rd:
@@ -81,7 +81,7 @@ def render():
             with c3:
                 rd_tenure = st.number_input("Tenure (Months)", min_value=6,
                                              max_value=120, value=24, step=1, key="rd_t")
-            rd_submit = st.form_submit_button("📊 Calculate RD", use_container_width=True)
+            rd_submit = st.form_submit_button("📊 Calculate RD", width='stretch')
 
         if rd_submit:
             s = generate_rd_schedule(rd_install, rd_rate, rd_tenure)
@@ -110,13 +110,13 @@ def render():
                 "Total Deposited (₹)":      f"₹{r.total_deposited:,.2f}",
                 "Cumulative Interest (₹)":  f"₹{r.cumulative_interest:,.2f}",
             } for r in s.schedule])
-            st.dataframe(df, use_container_width=True, hide_index=True)
+            st.dataframe(df, width='stretch', hide_index=True)
 
             xlsx = export_rd_excel(s)
             st.download_button("⬇️  Download RD Excel Report", xlsx,
                                "rd_report.xlsx",
                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                               use_container_width=True)
+                               width='stretch')
 
     # ── CI ────────────────────────────────────────────────────────────────────
     with tab_ci:
@@ -134,7 +134,7 @@ def render():
                                             max_value=40, value=5, step=1, key="ci_y")
             with c4:
                 ci_comp = st.selectbox("Compounding", COMPOUNDING_OPTIONS, index=0, key="ci_c")
-            ci_submit = st.form_submit_button("📊 Calculate CI", use_container_width=True)
+            ci_submit = st.form_submit_button("📊 Calculate CI", width='stretch')
 
         if ci_submit:
             s = generate_ci_schedule(ci_principal, ci_rate, ci_years, ci_comp)
@@ -161,10 +161,10 @@ def render():
                 "Closing Balance (₹)":      f"₹{r.closing_balance:,.2f}",
                 "Cumulative Interest (₹)":  f"₹{r.cumulative_interest:,.2f}",
             } for r in s.schedule])
-            st.dataframe(df, use_container_width=True, hide_index=True)
+            st.dataframe(df, width='stretch', hide_index=True)
 
             xlsx = export_ci_excel(s)
             st.download_button("⬇️  Download CI Excel Report", xlsx,
                                "ci_report.xlsx",
                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                               use_container_width=True)
+                               width='stretch')

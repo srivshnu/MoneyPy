@@ -72,7 +72,7 @@ def render():
         df_display['Total Payment'] = df_display['Total Payment'].apply(lambda x: f"₹{x:,.2f}")
         df_display['Total Interest'] = df_display['Total Interest'].apply(lambda x: f"₹{x:,.2f}")
         st.markdown("### Summary Metrics")
-        st.dataframe(df_display, use_container_width=True)
+        st.dataframe(df_display, width='stretch')
 
         st.markdown("---")
         # Combined outstanding balance chart (interactive Plotly)
@@ -85,7 +85,7 @@ def render():
         fig = px.line(combined_df, x='Month', y='Outstanding', color='Loan', title='Outstanding Balance Comparison')
         fig.update_traces(mode='lines', hovertemplate='Month: %{x}<br>Balance: %{y:,.2f}')
         fig.update_layout(legend_title_text='Loan', height=400)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
         # Export button
         try:
@@ -112,7 +112,7 @@ def render():
             deltas_display['Δ Total Interest'] = deltas_display['Δ Total Interest'].apply(lambda x: f"₹{x:,.2f}")
             deltas_display['Δ Total Payment'] = deltas_display['Δ Total Payment'].apply(lambda x: f"₹{x:,.2f}")
             st.markdown("### Pairwise Deltas (vs first loan)")
-            st.dataframe(deltas_display, use_container_width=True)
+            st.dataframe(deltas_display, width='stretch')
 
             # Provide CSV and Excel downloads for deltas
             csv_bytes = deltas_df.to_csv(index=False).encode('utf-8')
