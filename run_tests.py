@@ -7,6 +7,7 @@ TEST_MODULES = [
     'test_run',
     'test_prepayment',
     'test_multi_loan',
+    'test_investment_calc',
 ]
 
 def run():

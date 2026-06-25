@@ -59,6 +59,8 @@ class CISummary:
 	annual_rate: float
 	tenure_years: int
 	compounding: str
+	recurring_amount: float
+	total_contributions: float
 	maturity_amount: float
 	total_interest: float
 	schedule: List[CIScheduleRow]
@@ -142,34 +144,46 @@ def generate_rd_schedule(monthly_installment: float, annual_rate: float, tenure_
 	)
 
 
-def generate_ci_schedule(principal: float, annual_rate: float, tenure_years: int, compounding: str = "Monthly") -> CISummary:
-	freq = COMPOUNDING_FREQ.get(compounding, 12)
-	schedule = []
-	opening = float(principal)
-	cumulative = 0.0
+def generate_ci_schedule(principal: float, annual_rate: float, tenure_years: int, compounding: str = "Monthly", recurring_amount: float = 0.0) -> CISummary:
+    total_months = tenure_years * 12
+    monthly_rate = annual_rate / 12 / 100
+    schedule = []
+    opening = float(principal)
+    cumulative = 0.0
+    total_contributions = 0.0
+    year_opening = opening
+    year_interest = 0.0
 
-	for y in range(1, tenure_years + 1):
-		factor = (1 + (annual_rate / 100) / freq) ** freq
-		closing = round(opening * factor, 2)
-		interest = round(closing - opening, 2)
-		cumulative += interest
-		schedule.append(CIScheduleRow(
-			year=y,
-			opening_balance=opening,
-			interest_earned=interest,
-			closing_balance=closing,
-			cumulative_interest=round(cumulative, 2),
-		))
-		opening = closing
+    for month in range(1, total_months + 1):
+        interest = round(opening * monthly_rate, 2)
+        closing = round(opening + interest + recurring_amount, 2)
+        cumulative += interest
+        year_interest += interest
+        total_contributions += recurring_amount
+        opening = closing
 
-	maturity = schedule[-1].closing_balance if schedule else principal
-	total_interest = round(sum(r.interest_earned for r in schedule), 2)
+        if month % 12 == 0:
+            year = month // 12
+            schedule.append(CIScheduleRow(
+                year=year,
+                opening_balance=year_opening,
+                interest_earned=round(year_interest, 2),
+                closing_balance=opening,
+                cumulative_interest=round(cumulative, 2),
+            ))
+            year_opening = opening
+            year_interest = 0.0
 
-	return CISummary(
-		principal=principal,
-		annual_rate=annual_rate,
-		tenure_years=tenure_years,
-		compounding=compounding,
+    maturity = schedule[-1].closing_balance if schedule else principal
+    total_interest = round(sum(r.interest_earned for r in schedule), 2)
+
+    return CISummary(
+        principal=principal,
+        annual_rate=annual_rate,
+        tenure_years=tenure_years,
+        compounding=compounding,
+        recurring_amount=recurring_amount,
+        total_contributions=round(total_contributions, 2),
 		maturity_amount=maturity,
 		total_interest=total_interest,
 		schedule=schedule,

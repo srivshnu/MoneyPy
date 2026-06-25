@@ -149,6 +149,8 @@ def render():
                                             max_value=40, value=5, step=1, key="ci_y")
             with c4:
                 ci_comp = st.selectbox("Compounding", COMPOUNDING_OPTIONS, index=0, key="ci_c")
+            ci_recurring = st.number_input("Monthly Recurring Amount (₹)", min_value=0.0,
+                                           value=0.0, step=100.0, format="%.2f", key="ci_rec")
             ci_submit = st.form_submit_button("📊 Calculate CI", width='stretch')
 
         if ci_submit:
@@ -159,13 +161,14 @@ def render():
             })
             if missing:
                 return
-            s = generate_ci_schedule(ci_principal, ci_rate, ci_years, ci_comp)
+            s = generate_ci_schedule(ci_principal, ci_rate, ci_years, ci_comp, ci_recurring)
 
-            k1, k2, k3, k4 = st.columns(4)
+            k1, k2, k3, k4, k5 = st.columns(5)
             k1.metric("Principal", f"₹{s.principal:,.2f}")
-            k2.metric("Maturity Amount", f"₹{s.maturity_amount:,.2f}")
-            k3.metric("Total Interest", f"₹{s.total_interest:,.2f}")
-            k4.metric("Effective Yield", f"{s.total_interest/s.principal*100:.2f}%")
+            k2.metric("Monthly Recurring", f"₹{s.recurring_amount:,.2f}")
+            k3.metric("Maturity Amount", f"₹{s.maturity_amount:,.2f}")
+            k4.metric("Total Interest", f"₹{s.total_interest:,.2f}")
+            k5.metric("Effective Yield", f"{s.total_interest/s.principal*100:.2f}%")
 
             st.markdown("#### 📈 Yearly Growth")
             chart = pd.DataFrame({

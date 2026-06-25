@@ -259,12 +259,14 @@ def export_ci_excel(summary: CISummary) -> bytes:
     ws_sum.row_dimensions[2].height = 8
 
     summary_items = [
-        ("Principal Amount",      summary.principal,       CURRENCY_FMT),
-        ("Annual Interest Rate",  summary.annual_rate/100, PERCENT_FMT),
-        ("Tenure (Years)",        summary.tenure_years,    INT_FMT),
-        ("Compounding Frequency", summary.compounding,     None),
-        ("Maturity Amount",       summary.maturity_amount, CURRENCY_FMT),
-        ("Total Interest Earned", summary.total_interest,  CURRENCY_FMT),
+        ("Principal Amount",          summary.principal,           CURRENCY_FMT),
+        ("Monthly Recurring Amount",  summary.recurring_amount,    CURRENCY_FMT),
+        ("Total Contributions",       summary.total_contributions, CURRENCY_FMT),
+        ("Annual Interest Rate",      summary.annual_rate/100,     PERCENT_FMT),
+        ("Tenure (Years)",            summary.tenure_years,        INT_FMT),
+        ("Compounding Frequency",     summary.compounding,         None),
+        ("Maturity Amount",           summary.maturity_amount,     CURRENCY_FMT),
+        ("Total Interest Earned",     summary.total_interest,      CURRENCY_FMT),
         ("Effective Yield",
          round(summary.total_interest / summary.principal * 100, 2) if summary.principal else 0,
          '0.00"%"'),
