@@ -10,8 +10,20 @@ from investment_calc import generate_rd_schedule, calculate_runway, simulate_deb
 from ui_helpers import validate_required
 
 
+def normalize_debt_count(value) -> int:
+    try:
+        count = int(value)
+    except (TypeError, ValueError):
+        return 1
+    return max(1, min(10, count))
+
+
 def _format_currency(value: float) -> str:
     return f"₹{value:,.2f}"
+
+
+def format_net_worth_velocity(value: float) -> str:
+    return f"₹{float(value):,.2f} / month"
 
 
 def render():
@@ -53,9 +65,10 @@ def render():
 
     with st.expander("Debt Snowball vs Debt Avalanche Simulator", expanded=False):
         with st.form("debt_form"):
-            st.markdown("Enter up to 4 outstanding debts or credit lines.")
+            debt_count = normalize_debt_count(st.number_input("Number of debts to compare", min_value=1, max_value=10, value=4, step=1, key="debt_count"))
+            st.markdown(f"Enter details for {debt_count} outstanding debt or credit line(s).")
             debts = []
-            for i in range(1, 5):
+            for i in range(1, debt_count + 1):
                 cols = st.columns(4)
                 with cols[0]:
                     name = st.text_input(f"Debt {i} Name", value=f"Debt {i}", key=f"debt_name_{i}")
@@ -175,7 +188,7 @@ def render():
                 projection = project_net_worth(current_assets, current_liabilities, asset_growth, liability_reduction, int(months))
                 df = pd.DataFrame(projection)
                 df = df.set_index('Month')
-                st.metric("Net Worth Velocity", f"₹{projection[-1]['velocity']:, .2f} / month")
+                st.metric("Net Worth Velocity", format_net_worth_velocity(projection[-1]['velocity']))
                 st.line_chart(df[['Assets', 'Liabilities', 'Net Worth']])
                 convergence = next((row['Month'] for row in projection if row['Net Worth'] >= 0), None)
                 if convergence:
