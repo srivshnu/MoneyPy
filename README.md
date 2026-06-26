@@ -26,6 +26,12 @@ Additionally, a new **Co-ownership / Equity Contribution Tracker** page has been
 * **Fixed Deposits (FD):** Tracks deposit appreciation over configurable compounding frequencies (Monthly, Quarterly, Half-Yearly, Yearly) with accurate yield metrics.
 * **Recurring Deposits (RD):** Models fixed monthly installments, calculating cumulative compounding growth matrices alongside total interest yields.
 * **Compound Interest (CI):** Breaks down long-term wealth assets into a clean, multi-year performance structure.
+* **Personal Planning Hub:** A new set of planning tools helps with cash resiliency, debt payoff optimization, sinking funds, budgeting recommendations, and net worth projections. Features include:
+	- Emergency Fund Runway Calculator — estimates how many months your liquid reserves will cover essential monthly liabilities.
+	- Debt Snowball vs Debt Avalanche Simulator — compare payoff timelines and total interest for up to 4 debts using psychological (smallest-balance-first) or mathematical (highest-rate-first) strategies.
+	- Sinking Fund Allocation Planner — computes exact monthly contributions to hit a future target (and checks RD alignment).
+	- Rule-Based Budget Optimizer — recommends 50/30/20 buckets and flags when home EMI exceeds safe thresholds (35%/40% of net income).
+	- Net Worth Velocity Tracker — projects assets, liabilities, and net worth over a multi-month horizon and highlights the convergence point where assets exceed liabilities.
 
 ### 3. Data Portability & Reporting
 * **Excel Amortization Sheets:** Generates professional-grade multi-sheet workbooks using styling rules, cell formatting masks, headers, alternating data alignments, and terminal balance corrections.
