@@ -27,6 +27,7 @@ choice = st.sidebar.radio("Choose tool", [
     "Loan Calculator",
     "Payment → Tenure",
     "Investment Calculator",
+    "Personal Planning Hub",
     "Prepayment Impact",
     "Amortization Charts",
     "Multi-Loan Comparison",
@@ -37,6 +38,11 @@ if choice == "Loan Calculator":
     loan_mod.render()
 elif choice == "Payment → Tenure":
     pay_mod.render()
+elif choice == "Investment Calculator":
+    inv_mod.render()
+elif choice == "Personal Planning Hub":
+    plan_mod = load_module_from_path(os.path.join(BASE_DIR, "planning_page.py"), "planning_page")
+    plan_mod.render()
 elif choice == "Prepayment Impact":
     prepay_mod = load_module_from_path(os.path.join(BASE_DIR, "prepayment_page.py"), "prepayment_page")
     prepay_mod.render()

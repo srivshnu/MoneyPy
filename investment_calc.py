@@ -74,6 +74,131 @@ COMPOUNDING_FREQ = {
 }
 
 
+def calculate_runway(total_liquid: float, monthly_liabilities: float) -> float:
+	if monthly_liabilities <= 0:
+		return 0.0
+	return round(float(total_liquid) / float(monthly_liabilities), 2)
+
+
+def calculate_sinking_fund_monthly(target_amount: float, months: int, annual_rate: float = 0.0) -> float:
+	if months <= 0:
+		return 0.0
+	monthly_rate = annual_rate / 12 / 100
+	if monthly_rate == 0:
+		return round(float(target_amount) / months, 2)
+	factor = (1 + monthly_rate) ** months - 1
+	return round(float(target_amount) * monthly_rate / factor, 2)
+
+
+def _sort_debts(debts, method: str):
+	if method == 'snowball':
+		return sorted(debts, key=lambda d: (d['balance'], d['annual_rate']))
+	return sorted(debts, key=lambda d: (-d['annual_rate'], d['balance']))
+
+
+def simulate_debt_repayment(debts: list, monthly_budget: float, method: str = 'snowball') -> dict:
+	if monthly_budget <= 0:
+		raise ValueError('Monthly budget must be greater than zero.')
+	if method not in ('snowball', 'avalanche'):
+		raise ValueError('Method must be snowball or avalanche.')
+
+	active_debts = [
+		{
+			'name': d['name'],
+			'balance': float(d['balance']),
+			'annual_rate': float(d['annual_rate']),
+			'min_payment': float(d.get('min_payment', 0.0)),
+		}
+		for d in debts if float(d.get('balance', 0.0)) > 0.0
+	]
+
+	if not active_debts:
+		return {'months': 0, 'total_interest': 0.0, 'total_paid': 0.0, 'monthly_balances': []}
+
+	monthly_balances = []
+	total_interest = 0.0
+	total_paid = 0.0
+	month = 0
+	max_months = 600
+
+	while any(d['balance'] > 0.01 for d in active_debts) and month < max_months:
+		month += 1
+		# Accrue interest on each debt before payment
+		for d in active_debts:
+			if d['balance'] <= 0.0:
+				continue
+			interest = round(d['balance'] * d['annual_rate'] / 12 / 100, 2)
+			d['balance'] = round(d['balance'] + interest, 2)
+			total_interest += interest
+
+		budget_remaining = float(monthly_budget)
+		# Cover minimum payments first
+		for d in active_debts:
+			if d['balance'] <= 0.0:
+				continue
+			payment = min(d['min_payment'], d['balance'])
+			if budget_remaining >= payment:
+				d['balance'] = round(d['balance'] - payment, 2)
+				budget_remaining = round(budget_remaining - payment, 2)
+				total_paid += payment
+			else:
+				payment = round(budget_remaining, 2)
+				d['balance'] = round(d['balance'] - payment, 2)
+				total_paid += payment
+				budget_remaining = 0.0
+				break
+
+		# Apply extra funds to prioritized debt
+		if budget_remaining > 0.0:
+			target_debts = [d for d in active_debts if d['balance'] > 0.01]
+			if target_debts:
+				target_debts = _sort_debts(target_debts, method)
+				while budget_remaining > 0.0 and target_debts:
+					target = target_debts[0]
+					payment = min(budget_remaining, target['balance'])
+					target['balance'] = round(target['balance'] - payment, 2)
+					budget_remaining = round(budget_remaining - payment, 2)
+					total_paid += payment
+					if target['balance'] <= 0.01:
+						target_debts.pop(0)
+
+		monthly_balances.append(
+			{'Month': month, **{f"{d['name']} Balance": max(round(d['balance'], 2), 0.0) for d in active_debts}}
+		)
+
+	return {
+		'months': month,
+		'total_interest': round(total_interest, 2),
+		'total_paid': round(total_paid, 2),
+		'monthly_balances': monthly_balances,
+	}
+
+
+def project_net_worth(current_assets: float, current_liabilities: float, asset_growth: float, liability_reduction: float, months: int) -> list:
+	assets = float(current_assets)
+	liabilities = float(current_liabilities)
+	monthly_asset_rate = (1 + asset_growth / 100) ** (1 / 12) - 1 if asset_growth != 0 else 0.0
+	monthly_liability_rate = 1 - (1 - liability_reduction / 100) ** (1 / 12) if liability_reduction != 0 else 0.0
+	projection = []
+	previous_net_worth = assets - liabilities
+
+	for month in range(1, months + 1):
+		assets = round(assets * (1 + monthly_asset_rate), 2)
+		liabilities = round(liabilities * (1 - monthly_liability_rate), 2)
+		net_worth = round(assets - liabilities, 2)
+		velocity = round(net_worth - previous_net_worth, 2)
+		projection.append({
+			'Month': month,
+			'Assets': assets,
+			'Liabilities': liabilities,
+			'Net Worth': net_worth,
+			'velocity': velocity,
+		})
+		previous_net_worth = net_worth
+
+	return projection
+
+
 def generate_fd_schedule(principal: float, annual_rate: float, tenure_months: int, compounding: str = "Monthly") -> FDSummary:
 	monthly_rate = annual_rate / 12 / 100
 	schedule = []
